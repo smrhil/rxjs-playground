@@ -2,8 +2,9 @@ import { Observable, observable } from 'rxjs';
 
 const observable$ = new Observable<string>(subscriber => {
     console.log('Observable executed');
-    subscriber.next('Alice')
-
+    subscriber.next('Alice');
+    subscriber.next('Ben');
+    setTimeout(() => subscriber.next('Charlie'), 2000);
 });
 console.log('Before subscribe');
 observable$.subscribe(value => console.log(value));
