@@ -1,10 +1,15 @@
-import { Observable } from 'rxjs';
-import { name$, storeDataOnServer, storeDataOnServerError } from './external';
+import { Observable, observable } from 'rxjs';
 
-name$.subscribe(value => console.log(value));
-
-storeDataOnServer('some value').subscribe(value => console.log(value));
-storeDataOnServerError('some value').subscribe({
-next: value => console.log(value),
-error: err => console.log('Error when saving', err.message)
+const observable$ = new Observable<string>(subscriber => {
+    console.log('Observable executed');
+    subscriber.next('Alice');
+    setTimeout(() => subscriber.next('Sidi'), 2000) ;
+    setTimeout(() => subscriber.next('Meima'), 4000) ;
 });
+
+const subscription = observable$.subscribe(value => console.log(value));
+
+setTimeout(() => {
+    console.log('Unsubscribe')
+    subscription.unsubscribe()
+}, 3000)
