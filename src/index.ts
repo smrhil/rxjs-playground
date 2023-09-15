@@ -1,25 +1,31 @@
-import { from } from "rxjs";
+import { fromEvent, Observable } from "rxjs";
 
-// permet de créer a cold observable avec les valeurs du tableau en paramètre
-from(['Alice', 'Ben', 'Charlie']).subscribe({
-      next: value => console.log(value),
-      complete: () => console.log('Completed')
-})
+const triggerButton = document.querySelector('button#trigger');
 
-// convert a promise to Observable
-// a utiliser si on a une API qui retourne des promises et on veut le convertir en Obserable
-// pour utiliser les fonctionnalités de rxjs
+// const subscription = fromEvent<MouseEvent>(triggerButton, 'click').subscribe(
+//   event => console.log(event.type, event.x, event.y)
+// );
 
-const somePromise = new Promise((resolve, reject) => {
-      // resolve('Resolved!');
-      reject('Rejected!');
-    });
-    
-    const observableFromPromise$ = from(somePromise);
-    
-    observableFromPromise$.subscribe({
-      next: value => console.log(value),
-      error: err => console.log('Error:', err),
-      complete: () => console.log('Completed')
-    });
-    
+
+const triggerClick$ = new Observable<MouseEvent>(subscriber => {
+  const clickHandlerFn = (event: any) => {
+    console.log('Event callback executed');
+    subscriber.next(event);
+  };
+
+  triggerButton.addEventListener('click', clickHandlerFn);
+
+  return () => {
+    triggerButton.removeEventListener('click', clickHandlerFn);
+  };
+});
+
+const subscription = triggerClick$.subscribe(
+  event => console.log(event.type, event.x, event.y)
+);
+
+setTimeout(() => {
+  console.log('Unsubscribe');
+  subscription.unsubscribe();
+}, 5000);
+
