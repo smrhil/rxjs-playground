@@ -1,24 +1,20 @@
-import { interval, Observable, timer } from "rxjs";
 
-console.log('App started');
 
-const interval$ = new Observable<number>(subscriber => {
-  let counter = 0;
-  
-  const intervalId = setInterval(() => {
-    console.log('Timeout!');
-    subscriber.next(counter++);
-  }, 1000);
+import { forkJoin } from "rxjs";
+// Mike is from New Delhi and likes to eat pasta.
 
-  return () => clearInterval(intervalId);
-});
+import { AjaxResponse, ajax } from "rxjs/ajax";
 
-const subscription = interval$.subscribe({
-  next: value => console.log(value),
-  complete: () => console.log('Completed')
-});
+const randomName$ = ajax('https://random-data-api.com/api/name/random_name');
 
-setTimeout(() => {
-  subscription.unsubscribe();
-  console.log('Unsubscribe');
-}, 5000);
+const randomNation$ = ajax('https://random-data-api.com/api/nation/random_nation');
+
+const randomFood$ = ajax('https://random-data-api.com/api/food/random_food');
+
+//randomName$.subscribe((ajaxResponse: any) => console.log(ajaxResponse.response.name));
+//randomNation$.subscribe((ajaxResponse: any) => console.log(ajaxResponse.response.capital));
+//randomFood$.subscribe((ajaxResponse: any) => console.log(ajaxResponse.response.dish));
+
+forkJoin([randomName$, randomNation$, randomFood$]).subscribe(
+  ([nameAjax, nationAjax, foodAjax]: any[]) => console.log(`${nameAjax.response.name} is from ${nationAjax.response.capital} and likes to eat ${foodAjax.response.dish}.`)
+);
