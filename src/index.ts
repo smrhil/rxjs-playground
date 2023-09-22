@@ -1,31 +1,15 @@
-import { EMPTY, Observable, of } from "rxjs";
-import { catchError } from "rxjs/operators";
+import { Observable, concatMap, of } from "rxjs";
 
 
-const failingHttpRequest$ = new Observable(subscriber => {
-  setTimeout(() => {
-    subscriber.error(new Error('Timeout'));
-  }, 3000);
+const source$ = new Observable(subscriber => {
+  setTimeout(() => subscriber.next('A'), 2000);
+  setTimeout(() => subscriber.next('A'), 5000);
 });
 
-console.log('App started');
-
-// when the observable generates a error notification
-// catchError crée un nouveau observable avec fallback methode and it subscibes to it
-// and sends the result to the output
-failingHttpRequest$.pipe(
-  catchError(error => of('Failing!'))
-).subscribe({
-  next: value => console.log(value),
-  complete: () => console.log('Completed')
-});
-
-// dans certains cas on veut juste cacher l'erreur, on peut utiliser l'observable EMPTY de rxjs 
-// qui complete directement sans envoyer aucune valeur
-
-/*failingHttpRequest$.pipe(
-  catchError(error => EMPTY)
-).subscribe({
-  next: value => console.log(value),
-  complete: () => console.log('Completed')
-});*/
+// pour chaque valeur de l'observable source
+// concatMap crée une nouvelle inner subscription to the observable created by the fallback function 
+// of(1, 2) et renvoie le résultat à la sortie
+// les notification complete de l'inner subscription ne sont pas envoyées à la sortie
+source$.pipe(
+  concatMap(value => of(1, 2))
+).subscribe(value => console.log(value));
