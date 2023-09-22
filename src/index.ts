@@ -1,15 +1,21 @@
-import { Observable, concatMap, of } from "rxjs";
+import { EMPTY, fromEvent, of } from "rxjs";
+import { ajax } from "rxjs/ajax";
+import { catchError, concatMap, map } from "rxjs/operators";
 
+const endpointInput: HTMLInputElement = document.querySelector('input#endpoint');
+const fetchButton = document.querySelector('button#fetch');
 
-const source$ = new Observable(subscriber => {
-  setTimeout(() => subscriber.next('A'), 2000);
-  setTimeout(() => subscriber.next('A'), 5000);
+// par défaut concatMap renvoie la notification d'erreur à la sortie
+// pour éviter ça on peut utiliser catchError sur l'inner observable
+fromEvent(fetchButton, 'click').pipe(
+  map(() => endpointInput.value),
+  concatMap(value =>
+    ajax(`https://random-data-api.com/api/${value}/random_${value}`).pipe(
+      catchError(error => of(`Could not fetch data: ${error}`))
+    )
+  )
+).subscribe({
+  next: value => console.log(value),
+  error: err => console.log('Error:', err),
+  complete: () => console.log('Completed')
 });
-
-// pour chaque valeur de l'observable source
-// concatMap crée une nouvelle inner subscription to the observable created by the fallback function 
-// of(1, 2) et renvoie le résultat à la sortie
-// les notification complete de l'inner subscription ne sont pas envoyées à la sortie
-source$.pipe(
-  concatMap(value => of(1, 2))
-).subscribe(value => console.log(value));
