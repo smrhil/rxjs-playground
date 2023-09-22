@@ -1,24 +1,33 @@
-import { combineLatest, fromEvent } from "rxjs";
+import { Observable, filter } from "rxjs";
 
-const temperatureInput = document.getElementById('temperature-input');
-const conversionDropdown = document.getElementById('conversion-dropdown');
-const resultText = document.getElementById('result-text');
 
-const temperatureInputEvent$ = fromEvent(temperatureInput, 'input');
-const conversionInputEvent$ = fromEvent(conversionDropdown, 'input');
+interface NewsItem {
+  category: 'Business' | 'Sports';
+  content: string;
+}
 
-combineLatest([temperatureInputEvent$, conversionInputEvent$]).subscribe(
-  ([temperatureInputEvent, conversionInputEvent]: any[]) => {
-    const temperature = Number(temperatureInputEvent.target['value']);
-    const conversion = conversionInputEvent.target['value'];
 
-    let result: number;
-    if (conversion === 'f-to-c') {
-      result = (temperature - 32) * 5/9;
-    } else if (conversion === 'c-to-f') {
-      result = temperature * 9/5 + 32;
-    }
+const newsFeed$ = new Observable<NewsItem>(subscriber => {
+  setTimeout(() => {
+    subscriber.next({category: 'Business', content: 'A'})
+  }, 1000);
+  setTimeout(() => {
+    subscriber.next({category: 'Sports', content: 'B'})
+  }, 3000);
+  setTimeout(() => {
+    subscriber.next({category: 'Business', content: 'C'})
+  }, 4000);
+  setTimeout(() => {
+    subscriber.next({category: 'Sports', content: 'D'})
+  }, 6000);
+  setTimeout(() => {
+    subscriber.next({category: 'Business', content: 'E'})
+  }, 7000);
+});
 
-    resultText.innerText = String(result);
-  }
-);
+newsFeed$.pipe(
+  // ici on peut mettre plusieurs opérateurs
+  filter(item => item.category === 'Sports')
+).subscribe(
+  item => console.log(item)
+  );
