@@ -10,8 +10,12 @@
 
 # Quelques notes:
 
-1. Subject: est un Observable et Observer en même temps.
+1. Subject: 
+est un Observable et Observer en même temps.
 il est comme un hot observable
 il implémente les méthodes next, error ans complete
 la source de données est le Subject lui même
 il permet de faire du multicatsting
+
+2. BehaviorSubject: 
+comme un subject mais il stock la dernière notification qu'il emet à chaque nouveau subscriber

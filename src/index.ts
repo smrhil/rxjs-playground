@@ -1,24 +1,28 @@
-import { Subject, fromEvent, map, pipe } from "rxjs";
+import { BehaviorSubject, fromEvent, withLatestFrom } from "rxjs";
 
-const emitButton = document.querySelector('button#emit');
-const inputElement: HTMLInputElement = document.querySelector('#value-input');
-const subscribeButton = document.querySelector('button#subscribe');
+const loggedInSpan: HTMLElement = document.querySelector('span#logged-in');
+const loginButton: HTMLElement = document.querySelector('button#login');
+const logoutButton: HTMLElement = document.querySelector('button#logout');
+const printStateButton: HTMLElement = document.querySelector('button#print-state');
 
-// Subject est un Observable et Observer en même temps
-// il est comme un hot observable
-// il implémente les méthodes next, error ans complete
-// la source de données est le Subject lui même
-// il permet de faire du multicatsting
+const isLoggedIn$ = new BehaviorSubject<boolean>(false);
 
-const value$ = new Subject<string>();
+fromEvent(loginButton, 'click').subscribe(() => isLoggedIn$.next(true))
+fromEvent(logoutButton, 'click').subscribe(() => isLoggedIn$.next(false))
 
-fromEvent(emitButton, 'click').pipe(
-  map(() => inputElement.value)
-).subscribe(value$);
+// Navigation bar
+isLoggedIn$.subscribe(isLoggedIn => loggedInSpan.innerText = isLoggedIn.toString());
 
-fromEvent(subscribeButton, 'click').subscribe(
-  () => {
-    console.log('New subscription');
-    value$.subscribe(value => console.log(value));
-  }
+// Buttons
+isLoggedIn$.subscribe(
+  (isLoggedIn : boolean)  => {
+    loginButton.style.display = !isLoggedIn ? 'block' : 'none';
+    logoutButton.style.display = isLoggedIn ? 'block' : 'none';
+});
+
+// console l'état du behaviorSubject
+fromEvent(printStateButton, 'click').pipe(
+  withLatestFrom(isLoggedIn$)
+).subscribe(
+  ([event, isLoggedIn]) => console.log('User is logged in:', isLoggedIn)
 );
