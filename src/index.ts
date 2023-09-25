@@ -1,21 +1,24 @@
-import { EMPTY, fromEvent, of } from "rxjs";
-import { ajax } from "rxjs/ajax";
-import { catchError, concatMap, map } from "rxjs/operators";
+import { Subject, fromEvent, map, pipe } from "rxjs";
 
-const endpointInput: HTMLInputElement = document.querySelector('input#endpoint');
-const fetchButton = document.querySelector('button#fetch');
+const emitButton = document.querySelector('button#emit');
+const inputElement: HTMLInputElement = document.querySelector('#value-input');
+const subscribeButton = document.querySelector('button#subscribe');
 
-// par défaut concatMap renvoie la notification d'erreur à la sortie
-// pour éviter ça on peut utiliser catchError sur l'inner observable
-fromEvent(fetchButton, 'click').pipe(
-  map(() => endpointInput.value),
-  concatMap(value =>
-    ajax(`https://random-data-api.com/api/${value}/random_${value}`).pipe(
-      catchError(error => of(`Could not fetch data: ${error}`))
-    )
-  )
-).subscribe({
-  next: value => console.log(value),
-  error: err => console.log('Error:', err),
-  complete: () => console.log('Completed')
-});
+// Subject est un Observable et Observer en même temps
+// il est comme un hot observable
+// il implémente les méthodes next, error ans complete
+// la source de données est le Subject lui même
+// il permet de faire du multicatsting
+
+const value$ = new Subject<string>();
+
+fromEvent(emitButton, 'click').pipe(
+  map(() => inputElement.value)
+).subscribe(value$);
+
+fromEvent(subscribeButton, 'click').subscribe(
+  () => {
+    console.log('New subscription');
+    value$.subscribe(value => console.log(value));
+  }
+);

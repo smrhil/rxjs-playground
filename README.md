@@ -6,3 +6,12 @@
 4. Open the Console/DevTools in your browser to see the `console.log`s.
 5. Keep modifying the `src/index.html` and `src/index.ts` files to adjust the code you want to run. **Saving these files will automatically reload the page.**
 6. Enjoy!
+
+
+# Quelques notes:
+
+1. Subject: est un Observable et Observer en même temps.
+il est comme un hot observable
+il implémente les méthodes next, error ans complete
+la source de données est le Subject lui même
+il permet de faire du multicatsting
