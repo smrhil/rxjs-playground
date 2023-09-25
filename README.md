@@ -18,4 +18,5 @@ la source de données est le Subject lui même
 il permet de faire du multicatsting
 
 2. BehaviorSubject: 
-comme un subject mais il stock la dernière notification qu'il emet à chaque nouveau subscriber
+comme un subject mais il stock la dernière notification qu'il emet à chaque nouveau subscriber.
+Il a aussi une valeur initiale.
